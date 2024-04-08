@@ -23,3 +23,19 @@ steps:
     overrideParameters: '-projectName myarmpipe'
     deploymentMode: 'Incremental'
     deploymentName: 'DeployPipelineTemplate'
+
+- pwsh: |
+   Import-Module $(ttk.folder)/arm-ttk/arm-ttk.psd1 -Verbose
+   $testOutput = @(Test-AzTemplate -TemplatePath "$(sample.folder)")
+   $testOutput
+   
+   if ($testOutput | ? {$_.Errors }) {
+      exit 1 
+   } else {
+       Write-Host "##vso[task.setvariable variable=result.best.practice]$true"
+       exit 0
+   } 
+  errorActionPreference: continue
+  failOnStderr: true
+  displayName: 'Run Best Practices Tests'
+  continueOnError: true
